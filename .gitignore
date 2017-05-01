@@ -1,0 +1,10 @@
+# Maven
+target/
+
+# IntelliJ
+.idea/
+*.iml
+
+# H2
+*.mv.db
+*.h2.db
