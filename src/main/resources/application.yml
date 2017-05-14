@@ -1,0 +1,14 @@
+open-id-connect:
+  logout-url: https://www.google.com/accounts/Logout
+  redirect-uri: http://localhost:4200/api/auth/code
+  discovery-document-uri: https://accounts.google.com/.well-known/openid-configuration
+  client-id: 241147659016-m5tbp8dgmmmpun4t9415ofvipdthccoi.apps.googleusercontent.com
+  secret: ae7ftmx7fnLdsX6FNx53S5HI
+
+datasource.event-store.url: jdbc:h2:./eventstore
+datasource.event-store.username: sa
+datasource.event-store.password:
+
+datasource.read.url: jdbc:h2:./read
+datasource.read.username: sa
+datasource.read.password:
