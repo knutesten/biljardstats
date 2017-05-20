@@ -1,6 +1,7 @@
 package com.billiardsstats.web.auth
 
 import com.auth0.jwt.JWT
+import com.billiardsstats.read.user.User
 import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -15,12 +16,12 @@ class OpenIdConnectAuth(private val clientId: String,
         return "${discoveryDocument.getAuthorizationEndpoint()}?" +
                 "client_id=$clientId&" +
                 "response_type=code&" +
-                "scope=openid email&" +
+                "scope=openid email profile&" +
                 "redirect_uri=$redirectUri&" +
                 "state=$state"
     }
 
-    fun exchangeCodeForEmail(code: String): String {
+    fun exchangeCodeForUser(code: String): User {
         val form = FormBody.Builder()
                 .add("code", code)
                 .add("client_id", clientId)
@@ -38,8 +39,12 @@ class OpenIdConnectAuth(private val clientId: String,
                 .newCall(request)
                 .execute()
 
-        val token = ObjectMapper().readTree(response.body().bytes()).get("id_token").asText()
+        val token = JWT.decode(ObjectMapper().readTree(response.body().bytes()).get("id_token").asText())
 
-        return JWT.decode(token).getClaim("email").asString()
+        return User(
+                token.getClaim("sub").asString(),
+                token.getClaim("email").asString(),
+                token.getClaim("given_name").asString(),
+                token.getClaim("family_name").asString())
     }
 }

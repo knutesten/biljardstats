@@ -8,6 +8,7 @@ import org.axonframework.eventsourcing.eventstore.jdbc.JdbcEventStorageEngine
 import org.axonframework.eventsourcing.eventstore.jdbc.MySqlEventTableFactory
 import org.axonframework.spring.jdbc.SpringDataSourceConnectionProvider
 import org.axonframework.spring.messaging.unitofwork.SpringTransactionManager
+import org.h2.tools.Server
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
@@ -20,15 +21,21 @@ import org.springframework.context.annotation.Primary
 import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
+
 @SpringBootApplication
 open class Application {
     @Bean
     open fun init(restServices: Array<SparkService>) = CommandLineRunner {
+        val server = Server.createTcpServer().start()
+        println("*****************")
+        println("H2 tcp server started: " + server.url)
+        println("*****************")
+
         restServices.forEach(SparkService::init)
     }
 
     @Bean
-    @Qualifier("eventStore")
+    @Qualifier("eventStoreDataSource")
     @ConfigurationProperties("datasource.event-store")
     open fun eventStoreDataSource() = DataSourceBuilder.create().build()!!
 
@@ -38,10 +45,10 @@ open class Application {
     open fun readDataSource() = DataSourceBuilder.create().build()!!
 
     @Bean
-    open fun eventStore(@Qualifier("eventStore") eventStore: DataSource,
-                        transactionManager: PlatformTransactionManager): EventStorageEngine {
+    open fun eventStorageEngine(@Qualifier("eventStoreDataSource") datasource: DataSource,
+                                transactionManager: PlatformTransactionManager): EventStorageEngine {
         val eventStorageEngine = JdbcEventStorageEngine(
-                SpringDataSourceConnectionProvider(eventStore),
+                SpringDataSourceConnectionProvider(datasource),
                 SpringTransactionManager(transactionManager))
 
         eventStorageEngine.createSchema(MySqlEventTableFactory.INSTANCE)
