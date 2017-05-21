@@ -1,6 +1,7 @@
 package com.billiardsstats
 
-import com.billiardsstats.web.SparkService
+import com.billiardsstats.web.SparkRestService
+import com.billiardsstats.web.SparkWebSocketService
 import com.billiardsstats.web.auth.DiscoveryDocument
 import com.billiardsstats.web.auth.OpenIdConnectAuth
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine
@@ -19,19 +20,24 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.transaction.PlatformTransactionManager
+import spark.Spark
 import javax.sql.DataSource
 
 
 @SpringBootApplication
 open class Application {
     @Bean
-    open fun init(restServices: Array<SparkService>) = CommandLineRunner {
+    open fun init(restRestServices: Array<SparkRestService>,
+                  webSocketService: Array<SparkWebSocketService>) = CommandLineRunner {
         val server = Server.createTcpServer().start()
         println("*****************")
         println("H2 tcp server started: " + server.url)
         println("*****************")
 
-        restServices.forEach(SparkService::init)
+        webSocketService.forEach(SparkWebSocketService::init)
+        restRestServices.forEach(SparkRestService::init)
+
+        Spark.init()
     }
 
     @Bean

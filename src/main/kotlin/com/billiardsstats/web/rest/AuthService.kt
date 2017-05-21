@@ -1,7 +1,8 @@
 package com.billiardsstats.web.rest
 
 import com.billiardsstats.read.user.UserDao
-import com.billiardsstats.web.SparkService
+import com.billiardsstats.web.SparkRestService
+import com.billiardsstats.web.auth.JwtTokenUtil
 import com.billiardsstats.web.auth.OpenIdConnectAuth
 import com.billiardsstats.web.toJson
 import com.billiardsstats.write.user.CreateUserCommand
@@ -14,12 +15,14 @@ import spark.Spark.get
 import spark.Spark.halt
 import java.math.BigInteger
 import java.security.SecureRandom
+import java.time.Duration
 
 @Component
 open class AuthService(private val openIdConnectAuth: OpenIdConnectAuth,
                        private val userDao: UserDao,
                        private val commandGateway: CommandGateway,
-                       @Value("\${open-id-connect.logout-url") private val logoutUrl: String) : SparkService {
+                       private val jwtTokenUtil: JwtTokenUtil,
+                       @Value("\${open-id-connect.logout-url") private val logoutUrl: String) : SparkRestService {
     override fun init() {
         get("/api/auth/login") { req, res ->
             val state = BigInteger(130, SecureRandom()).toString(32)
@@ -44,6 +47,7 @@ open class AuthService(private val openIdConnectAuth: OpenIdConnectAuth,
                 commandGateway.send<Unit>(CreateUserCommand(user.id, user.email, user.givenName, user.familyName))
             }
 
+            res.cookie("/", "jwt", jwtTokenUtil.createTokenForUser(user.id), Duration.ofDays(2).seconds.toInt(), false)
             res.redirect("/")
             res
         }

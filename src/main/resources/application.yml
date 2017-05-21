@@ -5,6 +5,8 @@ open-id-connect:
   client-id: 241147659016-m5tbp8dgmmmpun4t9415ofvipdthccoi.apps.googleusercontent.com
   secret: ae7ftmx7fnLdsX6FNx53S5HI
 
+jwt.secret: 7nGRsL4yK8jgxmkFxaRnrZs2
+
 datasource.event-store.url: jdbc:h2:./eventstore
 datasource.event-store.username: sa
 datasource.event-store.password:

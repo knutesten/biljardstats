@@ -8,3 +8,4 @@ target/
 # H2
 *.mv.db
 *.h2.db
+*.trace.db
