@@ -7,12 +7,14 @@ open-id-connect:
 
 jwt.secret: 7nGRsL4yK8jgxmkFxaRnrZs2
 
-datasource.event-store.url: jdbc:h2:./eventstore
+#datasource.event-store.url: jdbc:h2:./eventstore
+datasource.event-store.url: jdbc:h2:mem:eventstore
 datasource.event-store.username: sa
 datasource.event-store.password:
 datasource.event-store.driverClassName: org.h2.Driver
 
-datasource.read.url: jdbc:h2:./read
+#datasource.read.url: jdbc:h2:./read
+datasource.read.url: jdbc:h2:mem:read
 datasource.read.username: sa
 datasource.read.password:
 datasource.read.driverClassName: org.h2.Driver
