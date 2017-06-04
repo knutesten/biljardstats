@@ -1,14 +1,15 @@
 package com.billiardsstats.web.websocket.protocol.`in`
 
 import com.billiardsstats.read.user.User
-import com.billiardsstats.web.game.GameType
+import com.billiardsstats.read.game.GameType
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
  * @author: Knut Esten Melandsø Nekså
  */
 
-class CreateGameRequest(val gameType: GameType, val opponent: User)
+class CreateGameRequest(@JsonProperty("gameType") val gameType: GameType, @JsonProperty("opponent") val opponent: User)
 
-class RejectGameRequest(val id: String)
+class RejectGameRequest(@JsonProperty("id") val id: String)
 
-class AcceptGameRequest(val id: String)
+class AcceptGameRequest(@JsonProperty("id") val id: String)

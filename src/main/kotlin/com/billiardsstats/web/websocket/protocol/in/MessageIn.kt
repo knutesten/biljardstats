@@ -1,13 +1,15 @@
 package com.billiardsstats.web.websocket.protocol.`in`
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlin.reflect.KClass
 
 /**
  * @author: Knut Esten Melandsø Nekså
  */
-class MessageIn(val type: MessageInType, val payload: String) {
-    fun decodePayload() = ObjectMapper().readValue(payload, type.clazz.java)!!
+class MessageIn(@JsonProperty("type") val type: MessageInType, @JsonProperty("payload") val payload: JsonNode) {
+    fun decodePayload() = ObjectMapper().treeToValue(payload, type.clazz.java)!!
 }
 
 enum class MessageInType(val clazz: KClass<out Any>) {

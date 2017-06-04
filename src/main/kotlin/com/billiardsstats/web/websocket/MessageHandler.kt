@@ -1,16 +1,16 @@
 package com.billiardsstats.web.websocket
 
+import com.billiardsstats.read.game.Game
 import com.billiardsstats.read.user.User
 import com.billiardsstats.web.game.GameManager
 import com.billiardsstats.web.websocket.protocol.`in`.AcceptGameRequest
 import com.billiardsstats.web.websocket.protocol.`in`.CreateGameRequest
 import com.billiardsstats.web.websocket.protocol.`in`.RejectGameRequest
 import com.billiardsstats.web.websocket.protocol.out.GameRequest
+import com.billiardsstats.web.websocket.protocol.out.GameRequestAccepted
 import com.billiardsstats.web.websocket.protocol.out.MessageOutType.*
 import com.billiardsstats.write.game.CreateEightBallGameCommand
-import com.billiardsstats.write.game.EightBallGameCreatedEvent
 import org.axonframework.commandhandling.gateway.CommandGateway
-import org.axonframework.eventhandling.EventHandler
 import org.eclipse.jetty.websocket.api.Session
 import org.springframework.stereotype.Component
 
@@ -42,7 +42,6 @@ open class MessageHandler(private val commandGateway: CommandGateway) {
 
         if (GameManager.userIsPlaying(createGameRequest.opponent)) {
             session.sendJsonAsync(GAME_REQUEST_REJECTED)
-            opponentSession.sendJsonAsync(GAME_REQUEST_REJECTED)
             return
         }
 
@@ -64,9 +63,10 @@ open class MessageHandler(private val commandGateway: CommandGateway) {
         commandGateway.send<Unit>(CreateEightBallGameCommand(game.id, game.challenger.id, game.opponent.id))
     }
 
-    @EventHandler
-    fun onEightBallGameCreated(eightBallGameCreatedEvent: EightBallGameCreatedEvent) {
-        println("EightBallGameCreated: " + eightBallGameCreatedEvent.id)
+    fun handleGameCreated(game: Game) {
+        val payload = GameRequestAccepted(game.type, game)
+        SessionManager.session(game.challenger).sendJsonAsync(GAME_REQUEST_ACCEPTED, payload)
+        SessionManager.session(game.opponent).sendJsonAsync(GAME_REQUEST_ACCEPTED, payload)
     }
 
     fun broadcastUserDisconnected(user: User) =

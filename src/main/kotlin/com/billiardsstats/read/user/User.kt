@@ -1,6 +1,11 @@
 package com.billiardsstats.read.user
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 /**
  * @author: Knut Esten Melandsø Nekså
  */
-data class User(val id: String, val email: String, val givenName: String, val familyName: String)
+data class User(@JsonProperty("id") val id: String,
+                @JsonProperty("email") val email: String,
+                @JsonProperty("givenName") val givenName: String,
+                @JsonProperty("familyName") val familyName: String)
