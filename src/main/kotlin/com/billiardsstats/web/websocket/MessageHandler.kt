@@ -11,6 +11,7 @@ import com.billiardsstats.web.websocket.protocol.out.GameRequestAccepted
 import com.billiardsstats.web.websocket.protocol.out.MessageOutType.*
 import com.billiardsstats.write.game.CreateEightBallGameCommand
 import org.axonframework.commandhandling.gateway.CommandGateway
+import org.axonframework.eventhandling.EventHandler
 import org.eclipse.jetty.websocket.api.Session
 import org.springframework.stereotype.Component
 
@@ -50,7 +51,7 @@ open class MessageHandler(private val commandGateway: CommandGateway) {
     }
 
     fun handleRejectGameRequest(session: Session, rejectGameRequest: RejectGameRequest) {
-        val game = GameManager.game(rejectGameRequest.id)
+        val game = GameManager.gameEntry(rejectGameRequest.id)
         GameManager.abortGame(game)
 
         val challengerSession = SessionManager.session(game.challenger)
@@ -59,10 +60,11 @@ open class MessageHandler(private val commandGateway: CommandGateway) {
     }
 
     fun handleAcceptGameRequest(acceptGameRequest: AcceptGameRequest) {
-        val game = GameManager.game(acceptGameRequest.id)
+        val game = GameManager.gameEntry(acceptGameRequest.id)
         commandGateway.send<Unit>(CreateEightBallGameCommand(game.id, game.challenger.id, game.opponent.id))
     }
 
+    @EventHandler
     fun handleGameCreated(game: Game) {
         val payload = GameRequestAccepted(game.type, game)
         SessionManager.session(game.challenger).sendJsonAsync(GAME_REQUEST_ACCEPTED, payload)

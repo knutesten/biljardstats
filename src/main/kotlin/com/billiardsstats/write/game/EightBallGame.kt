@@ -1,5 +1,6 @@
 package com.billiardsstats.write.game
 
+import com.billiardsstats.read.game.Group
 import org.axonframework.commandhandling.CommandHandler
 import org.axonframework.commandhandling.model.AggregateIdentifier
 import org.axonframework.commandhandling.model.AggregateLifecycle
@@ -13,8 +14,17 @@ import org.axonframework.spring.stereotype.Aggregate
 class EightBallGame {
     @AggregateIdentifier
     lateinit var id: String
+
     lateinit var challengerId: String
+    lateinit var challengerTargetGroup: Group
+    var challengerPocketedBalls = emptyArray<Int>()
+
     lateinit var opponentId: String
+    lateinit var opponentTargetGroup: Group
+    var opponentPocketedBalls = emptyArray<Int>()
+
+    lateinit var breakerId: String
+    lateinit var winnerId: String
 
     constructor()
 

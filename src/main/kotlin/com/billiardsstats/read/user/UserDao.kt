@@ -2,17 +2,17 @@ package com.billiardsstats.read.user
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 
 /**
  * @author: Knut Esten Melandsø Nekså
  */
 
-@Component
+@Repository
 open class UserDao(val namedTemplate: NamedParameterJdbcTemplate) {
     fun findById(id: String): User {
         return namedTemplate.queryForObject(
-                "SELECT * FROM user WHERE id = :id",
+                "SELECT * FROM users WHERE id = :id",
                 MapSqlParameterSource().addValue("id", id),
                 { rs, _ ->
                     User(
@@ -25,7 +25,7 @@ open class UserDao(val namedTemplate: NamedParameterJdbcTemplate) {
 
     fun create(user: User) {
         namedTemplate.update("" +
-                "INSERT INTO user (id, email, given_name, family_name)" +
+                "INSERT INTO users (id, email, given_name, family_name)" +
                 "VALUES (:id, :email, :given_name, :family_name)",
                 MapSqlParameterSource()
                         .addValue("id", user.id)
